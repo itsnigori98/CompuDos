@@ -1,5 +1,6 @@
 package edu.icesi.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class Event {
 
     @Column(name = "userId", nullable = false)
     @OneToMany(mappedBy = "")
+    @JsonIgnore
     private List<User> users = new ArrayList<>();
 
     @ManyToOne

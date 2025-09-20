@@ -1,5 +1,6 @@
 package edu.icesi.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Notification {
 
 
     @ManyToMany(mappedBy = "notifications")
+    @JsonIgnore
     private List<User> users = new ArrayList<>();
 
     public Integer getId(){return id;} public void setId(Integer id){this.id=id;}

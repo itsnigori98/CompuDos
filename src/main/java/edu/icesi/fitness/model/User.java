@@ -1,5 +1,6 @@
 package edu.icesi.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.*;
 
@@ -33,10 +34,12 @@ public class User {
 
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Progress> progresses = new ArrayList<>();
 
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "user_notifications", // tabla intermedia
             joinColumns = @JoinColumn(name = "user_id"),
@@ -46,15 +49,17 @@ public class User {
 
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
-            name = "user_rutines", // tabla intermedia
+            name = "user_routines", // tabla intermedia
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "rutine_id")
+            inverseJoinColumns = @JoinColumn(name = "routine_id")
     )
-    private List<Rutine> rutines = new ArrayList<>();
+    private List<Routine> routines = new ArrayList<>();
 
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -65,7 +70,6 @@ public class User {
 
 
     public User() {}
-    // getters & setters
 
     public Integer getId(){return id;} public void setId(Integer id){this.id=id;}
     public String getName(){return name;} public void setName(String name){this.name=name;}
@@ -74,12 +78,12 @@ public class User {
     public String getSex(){return sex;} public void setSex(String sex){this.sex=sex;}
     public String getType(){return type;} public void setType(String type){this.type=type;}
 
-    public List<Rutine> getRutines() {
-        return rutines;
+    public List<Routine> getRoutines() {
+        return routines;
     }
 
-    public void setRutines(List<Rutine> rutines) {
-        this.rutines = rutines;
+    public void setRoutines(List<Routine> routines) {
+        this.routines = routines;
     }
 
     public List<Notification> getNotifications() {
@@ -96,5 +100,29 @@ public class User {
 
     public void setProgresses(List<Progress> progresses) {
         this.progresses = progresses;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

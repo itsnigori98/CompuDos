@@ -44,7 +44,7 @@ INSERT INTO user_notifications (user_id, notification_id) VALUES (2, 3);
 -- EVENTS
 -- ============================================
 INSERT INTO events (id, name, date, notificationId)
-VALUES (1, 'Clase Pilates', '2025-09-19 10:30:00', 1);
+VALUES (1, 'Clase Pilates', '2025-09-21 10:30:00', 1);
 
 -- ============================================
 -- EXERCISES
@@ -65,23 +65,23 @@ VALUES (3, 'Burpees', 'Cardio', 'Ejercicio de cuerpo completo',
 -- ============================================
 -- RUTINES
 -- ============================================
-INSERT INTO rutines (id, name ,type) VALUES (1, 'Full Body Rutine','Fuerza');
-INSERT INTO rutines (id, name,type) VALUES (2, 'Cardio Express','Cardio');
-INSERT INTO rutines (id, name,type) VALUES (3, 'Extreme Flexibility','Flexibilidad');
+INSERT INTO routines (id, name ,type) VALUES (1, 'Full Body Rutine','Fuerza');
+INSERT INTO routines (id, name,type) VALUES (2, 'Cardio Express','Cardio');
+INSERT INTO routines (id, name,type) VALUES (3, 'Extreme Flexibility','Flexibilidad');
 
 -- USER - RUTINES
-INSERT INTO user_rutines (user_id, rutine_id) VALUES (1, 1);
-INSERT INTO user_rutines (user_id, rutine_id) VALUES (2, 1);
-INSERT INTO user_rutines (user_id, rutine_id) VALUES (2, 2);
+INSERT INTO user_routines (user_id, routine_id) VALUES (1, 1);
+INSERT INTO user_routines (user_id, routine_id) VALUES (2, 1);
+INSERT INTO user_routines (user_id, routine_id) VALUES (2, 2);
 
 -- RUTINE - EXERCISES
--- Full Body Rutine: Press Bench + Sentadillas
-INSERT INTO rutine_exercises (rutine_id, exercise_id) VALUES (1, 1);
-INSERT INTO rutine_exercises (rutine_id, exercise_id) VALUES (1, 2);
+-- Full Body Routine: Press Bench + Sentadillas
+INSERT INTO routine_exercises (routine_id, exercise_id) VALUES (1, 1);
+INSERT INTO routine_exercises (routine_id, exercise_id) VALUES (1, 2);
 
 -- Cardio Express: Burpees + Sentadillas
-INSERT INTO rutine_exercises (rutine_id, exercise_id) VALUES (2, 2);
-INSERT INTO rutine_exercises (rutine_id, exercise_id) VALUES (2, 3);
+INSERT INTO routine_exercises (routine_id, exercise_id) VALUES (2, 2);
+INSERT INTO routine_exercises (routine_id, exercise_id) VALUES (2, 3);
 
 -- ============================================
 -- PROGRESSES

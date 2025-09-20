@@ -1,5 +1,6 @@
 package edu.icesi.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -33,9 +34,10 @@ public class Exercise {
     private String videoUrl;
 
 
-    // Relación ManyToMany con Rutines
+    // Relación ManyToMany con Routines
     @ManyToMany(mappedBy = "exercises")
-    private List<Rutine> rutines = new ArrayList<>();
+    @JsonIgnore
+    private List<Routine> routines = new ArrayList<>();
 
 
     // getters/setters
@@ -47,11 +49,11 @@ public class Exercise {
     public Integer getRepetitions(){return repetitions;} public void setRepetitions(Integer r){this.repetitions=r;}
     public String getVideoUrl(){return videoUrl;} public void setVideoUrl(String v){this.videoUrl=v;}
 
-    public List<Rutine> getRutines() {
-        return rutines;
+    public List<Routine> getRoutines() {
+        return routines;
     }
 
-    public void setRutines(List<Rutine> rutines) {
-        this.rutines = rutines;
+    public void setRoutines(List<Routine> routines) {
+        this.routines = routines;
     }
 }
