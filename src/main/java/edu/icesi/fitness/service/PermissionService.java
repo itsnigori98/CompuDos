@@ -10,10 +10,10 @@ import java.util.List;
 @Service
 public class PermissionService {
 
-    private final PermissionRepository permissions;
+    private final PermissionRepository permissionRepository;
 
-    public PermissionService(PermissionRepository permissions) {
-        this.permissions = permissions;
+    public PermissionService(PermissionRepository permissionRepository) {
+        this.permissionRepository = permissionRepository;
     }
 
     @Transactional
@@ -21,18 +21,29 @@ public class PermissionService {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Permission name is required");
         }
-        if (permissions.existsByName(name)) {
-            // idempotente
-            return permissions.findByName(name).orElseThrow();
-        }
-        Permission p = new Permission();
-        p.setName(name);
-        return permissions.save(p);
+        return permissionRepository.findByName(name)
+                .orElseGet(() -> {
+                    Permission p = new Permission();
+                    p.setName(name);
+                    return permissionRepository.save(p);
+                });
     }
 
     @Transactional(readOnly = true)
     public List<Permission> listAll() {
-        return permissions.findAll();
+        return permissionRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Permission getByName(String name) {
+        return permissionRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("Permission not found: " + name));
+    }
+
+    @Transactional
+    public void deleteByName(String name) {
+        Permission p = permissionRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("Permission not found: " + name));
+        permissionRepository.delete(p);
     }
 }
-
