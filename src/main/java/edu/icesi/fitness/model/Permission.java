@@ -3,21 +3,12 @@ package edu.icesi.fitness.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="permissions")
+@Table(name = "Permissions")
 public class Permission {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false, unique = true)
     private String name;
-    public Permission(){}
-
-    public String getId(){
-        return id;}
-
-    public void setId(String id){
-        this.id=id;}
-    public String getName(){
-        return name;}
-    public void setName(String name){
-
-        this.name=name;}
 }

@@ -2,27 +2,56 @@ package edu.icesi.fitness.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="exercises")
 public class Exercise {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "type", nullable = false)
     private String type;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+
+    @Column(name = "sets_count")
     private Integer setsCount;
+
+
+    @Column(name = "repetitions")
     private Integer repetitions;
-    private String routineId;
+
+    @Column(name = "video_Url")
     private String videoUrl;
-    private String difficulty;
+
+
+    // Relación ManyToMany con Rutines
+    @ManyToMany(mappedBy = "exercises")
+    private List<Rutine> rutines = new ArrayList<>();
+
+
     // getters/setters
-    public String getId(){return id;} public void setId(String id){this.id=id;}
+    public Integer getId(){return id;} public void setId(Integer id){this.id=id;}
     public String getName(){return name;} public void setName(String name){this.name=name;}
     public String getType(){return type;} public void setType(String t){this.type=t;}
     public String getDescription(){return description;} public void setDescription(String d){this.description=d;}
     public Integer getSetsCount(){return setsCount;} public void setSetsCount(Integer s){this.setsCount=s;}
     public Integer getRepetitions(){return repetitions;} public void setRepetitions(Integer r){this.repetitions=r;}
-    public String getRoutineId(){return routineId;} public void setRoutineId(String r){this.routineId=r;}
     public String getVideoUrl(){return videoUrl;} public void setVideoUrl(String v){this.videoUrl=v;}
-    public String getDifficulty(){return difficulty;} public void setDifficulty(String d){this.difficulty=d;}
+
+    public List<Rutine> getRutines() {
+        return rutines;
+    }
+
+    public void setRutines(List<Rutine> rutines) {
+        this.rutines = rutines;
+    }
 }

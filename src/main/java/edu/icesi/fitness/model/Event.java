@@ -2,16 +2,45 @@ package edu.icesi.fitness.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Entity
 @Table(name="events")
 public class Event {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String userId;
-    private String notificationId;
-    public String getId(){return id;} public void setId(String id){this.id=id;}
+
+    @Column(name = "date", nullable = false)
+    private Date date;
+
+
+    @Column(name = "userId", nullable = false)
+    @OneToMany(mappedBy = "")
+    private List<User> users = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "notificationid", nullable = false, unique = true)
+    private Notification notificationId;
+
+    public Integer getId(){return id;} public void setId(Integer id){this.id=id;}
     public String getName(){return name;} public void setName(String n){this.name=n;}
-    public String getUserId(){return userId;} public void setUserId(String u){this.userId=u;}
-    public String getNotificationId(){return notificationId;} public void setNotificationId(String n){this.notificationId=n;}
+    public Notification getNotificationId(){return notificationId;} public void setNotificationId(Notification n){this.notificationId=n;}
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
 }

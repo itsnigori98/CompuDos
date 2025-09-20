@@ -4,18 +4,59 @@ import jakarta.persistence.*;
 import java.util.*;
 
 @Entity
-@Table(name="routines")
+@Table(name="rutines")
 public class Rutine {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "type", nullable = false)
     private String type;
-    private String userId;
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name="routineId", insertable=false, updatable=false)
+
+
+
+    @ManyToMany(mappedBy = "rutines")
+    private List<User> users = new ArrayList<>();
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "rutine_exercises",
+            joinColumns = @JoinColumn(name = "rutine_id"),
+            inverseJoinColumns = @JoinColumn(name = "exercise_id")
+    )
     private List<Exercise> exercises = new ArrayList<>();
+
+    public Rutine(String name) {
+        this.name = name;
+    }
+
+    public Rutine() {
+
+    }
+
     // getters/setters
-    public String getId(){return id;} public void setId(String id){this.id=id;}
+    public Integer getId(){return id;} public void setId(Integer id){this.id=id;}
     public String getType(){return type;} public void setType(String t){this.type=t;}
-    public String getUserId(){return userId;} public void setUserId(String u){this.userId=u;}
+
     public List<Exercise> getExercises(){return exercises;} public void setExercises(List<Exercise> e){this.exercises=e;}
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

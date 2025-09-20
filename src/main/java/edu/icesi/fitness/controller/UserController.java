@@ -16,11 +16,7 @@ public class UserController {
     public Optional<User> get(@PathVariable String id){ return service.getById(id); }
     @PostMapping
     public User create(@RequestBody User u){ return service.save(u); }
-    @PutMapping("/{id}")
-    public User update(@PathVariable String id, @RequestBody User u){
-        u.setId(id);
-        return service.save(u);
-    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id){ service.delete(id); }
 }
