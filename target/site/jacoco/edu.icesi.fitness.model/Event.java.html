@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Event.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SpringBoot1</a> &gt; <a href="index.source.html" class="el_package">edu.icesi.fitness.model</a> &gt; <span class="el_source">Event.java</span></div><h1>Event.java</h1><pre class="source lang-java linenums">package edu.icesi.fitness.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Table(name=&quot;events&quot;)
+<span class="nc" id="L12">public class Event {</span>
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = &quot;name&quot;, nullable = false)
+    private String name;
+
+    @Column(name = &quot;date&quot;, nullable = false)
+    private Date date;
+
+
+<span class="nc" id="L24">    @Column(name = &quot;userId&quot;, nullable = false)</span>
+    @OneToMany(mappedBy = &quot;&quot;)
+    @JsonIgnore
+    private List&lt;User&gt; users = new ArrayList&lt;&gt;();
+
+    @ManyToOne
+    @JoinColumn(name = &quot;notificationid&quot;, nullable = false, unique = true)
+    private Notification notificationId;
+
+<span class="nc" id="L33">    public Integer getId(){return id;} public void setId(Integer id){this.id=id;}</span>
+<span class="nc" id="L34">    public String getName(){return name;} public void setName(String n){this.name=n;}</span>
+<span class="nc" id="L35">    public Notification getNotificationId(){return notificationId;} public void setNotificationId(Notification n){this.notificationId=n;}</span>
+
+    public Date getDate() {
+<span class="nc" id="L38">        return date;</span>
+    }
+
+    public void setDate(Date date) {
+<span class="nc" id="L42">        this.date = date;</span>
+<span class="nc" id="L43">    }</span>
+
+    public List&lt;User&gt; getUsers() {
+<span class="nc" id="L46">        return users;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

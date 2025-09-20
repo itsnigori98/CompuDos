@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Routine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SpringBoot1</a> &gt; <a href="index.source.html" class="el_package">edu.icesi.fitness.model</a> &gt; <span class="el_source">Routine.java</span></div><h1>Routine.java</h1><pre class="source lang-java linenums">package edu.icesi.fitness.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import java.util.*;
+
+@Entity
+@Table(name=&quot;routines&quot;)
+public class Routine {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = &quot;name&quot;, nullable = false)
+    private String name;
+
+    @Column(name = &quot;type&quot;, nullable = false)
+    private String type;
+
+
+
+<span class="nc" id="L22">    @ManyToMany(mappedBy = &quot;routines&quot;)</span>
+    @JsonIgnore
+    private List&lt;User&gt; users = new ArrayList&lt;&gt;();
+
+
+<span class="nc" id="L27">    @ManyToMany</span>
+    @JsonIgnore
+    @JoinTable(
+            name = &quot;routine_exercises&quot;,
+            joinColumns = @JoinColumn(name = &quot;routine_id&quot;),
+            inverseJoinColumns = @JoinColumn(name = &quot;exercise_id&quot;)
+    )
+    private List&lt;Exercise&gt; exercises = new ArrayList&lt;&gt;();
+
+<span class="nc" id="L36">    public Routine(String name) {</span>
+<span class="nc" id="L37">        this.name = name;</span>
+<span class="nc" id="L38">    }</span>
+
+<span class="nc" id="L40">    public Routine() {</span>
+
+<span class="nc" id="L42">    }</span>
+
+    // getters/setters
+<span class="nc" id="L45">    public Integer getId(){return id;} public void setId(Integer id){this.id=id;}</span>
+<span class="nc" id="L46">    public String getType(){return type;} public void setType(String t){this.type=t;}</span>
+
+<span class="nc" id="L48">    public List&lt;Exercise&gt; getExercises(){return exercises;} public void setExercises(List&lt;Exercise&gt; e){this.exercises=e;}</span>
+
+    public List&lt;User&gt; getUsers() {
+<span class="nc" id="L51">        return users;</span>
+    }
+
+    public void setUsers(List&lt;User&gt; users) {
+<span class="nc" id="L55">        this.users = users;</span>
+<span class="nc" id="L56">    }</span>
+
+    public String getName() {
+<span class="nc" id="L59">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="nc" id="L63">        this.name = name;</span>
+<span class="nc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

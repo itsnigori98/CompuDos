@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SpringBoot1</a> &gt; <a href="index.source.html" class="el_package">edu.icesi.fitness.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package edu.icesi.fitness.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import java.util.*;
+
+@Entity
+@Table(name = &quot;users&quot;)
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = &quot;email&quot;, nullable = false)
+    private String email;
+
+    @Column(name = &quot;password&quot;, nullable = false)
+    private String password;
+
+    @Column(name = &quot;name&quot;, nullable = false)
+    private String name;
+
+    @Column(name = &quot;age&quot;, nullable = false)
+    private Integer age;
+
+    @Column(name = &quot;weight&quot;, nullable = false)
+    private Double weight;
+
+    @Column(name = &quot;sex&quot;, nullable = false)
+    private String sex;
+
+    @Column(name = &quot;type&quot;, nullable = false)
+    private String type;
+
+
+<span class="fc" id="L36">    @OneToMany(mappedBy = &quot;user&quot;)</span>
+    @JsonIgnore
+    private List&lt;Progress&gt; progresses = new ArrayList&lt;&gt;();
+
+
+<span class="fc" id="L41">    @ManyToMany</span>
+    @JsonIgnore
+    @JoinTable(
+            name = &quot;user_notifications&quot;, // tabla intermedia
+            joinColumns = @JoinColumn(name = &quot;user_id&quot;),
+            inverseJoinColumns = @JoinColumn(name = &quot;notification_id&quot;)
+    )
+    private List&lt;Notification&gt; notifications = new ArrayList&lt;&gt;();
+
+
+<span class="fc" id="L51">    @ManyToMany</span>
+    @JsonIgnore
+    @JoinTable(
+            name = &quot;user_routines&quot;, // tabla intermedia
+            joinColumns = @JoinColumn(name = &quot;user_id&quot;),
+            inverseJoinColumns = @JoinColumn(name = &quot;routine_id&quot;)
+    )
+    private List&lt;Routine&gt; routines = new ArrayList&lt;&gt;();
+
+
+<span class="fc" id="L61">    @ManyToMany</span>
+    @JsonIgnore
+    @JoinTable(
+            name = &quot;user_roles&quot;,
+            joinColumns = @JoinColumn(name = &quot;user_id&quot;),
+            inverseJoinColumns = @JoinColumn(name = &quot;role_id&quot;)
+    )
+    private List&lt;Role&gt; roles = new ArrayList&lt;&gt;();
+
+
+
+<span class="fc" id="L72">    public User() {}</span>
+
+<span class="pc" id="L74">    public Long getId(){return id;} public void setId(Long id){this.id=id;}</span>
+<span class="fc" id="L75">    public String getName(){return name;} public void setName(String name){this.name=name;}</span>
+<span class="nc" id="L76">    public Integer getAge(){return age;} public void setAge(Integer age){this.age=age;}</span>
+<span class="nc" id="L77">    public Double getWeight(){return weight;} public void setWeight(Double weight){this.weight=weight;}</span>
+<span class="nc" id="L78">    public String getSex(){return sex;} public void setSex(String sex){this.sex=sex;}</span>
+<span class="nc" id="L79">    public String getType(){return type;} public void setType(String type){this.type=type;}</span>
+
+    public List&lt;Routine&gt; getRoutines() {
+<span class="nc" id="L82">        return routines;</span>
+    }
+
+    public void setRoutines(List&lt;Routine&gt; routines) {
+<span class="nc" id="L86">        this.routines = routines;</span>
+<span class="nc" id="L87">    }</span>
+
+    public List&lt;Notification&gt; getNotifications() {
+<span class="nc" id="L90">        return notifications;</span>
+    }
+
+    public void setNotifications(List&lt;Notification&gt; notifications) {
+<span class="nc" id="L94">        this.notifications = notifications;</span>
+<span class="nc" id="L95">    }</span>
+
+    public List&lt;Progress&gt; getProgresses() {
+<span class="nc" id="L98">        return progresses;</span>
+    }
+
+    public void setProgresses(List&lt;Progress&gt; progresses) {
+<span class="nc" id="L102">        this.progresses = progresses;</span>
+<span class="nc" id="L103">    }</span>
+
+    public String getEmail() {
+<span class="fc" id="L106">        return email;</span>
+    }
+
+    public void setEmail(String email) {
+<span class="fc" id="L110">        this.email = email;</span>
+<span class="fc" id="L111">    }</span>
+
+    public List&lt;Role&gt; getRoles() {
+<span class="fc" id="L114">        return roles;</span>
+    }
+
+    public void setRoles(List&lt;Role&gt; roles) {
+<span class="fc" id="L118">        this.roles = roles;</span>
+<span class="fc" id="L119">    }</span>
+
+    public void setRole(Role role) {
+<span class="nc" id="L122">        this.roles.add(role);</span>
+<span class="nc" id="L123">    }</span>
+
+    public String getPassword() {
+<span class="fc" id="L126">        return password;</span>
+    }
+
+    public void setPassword(String password) {
+<span class="fc" id="L130">        this.password = password;</span>
+<span class="fc" id="L131">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

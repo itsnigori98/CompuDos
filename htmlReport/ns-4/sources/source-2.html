@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RoleService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">edu.icesi.fitness.service</a>
+</div>
+
+<h1>Coverage Summary for Class: RoleService (edu.icesi.fitness.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RoleService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66,7%
+  </span>
+  <span class="absValue">
+    (8/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63,2%
+  </span>
+  <span class="absValue">
+    (24/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83,3%
+  </span>
+  <span class="absValue">
+    (60/72)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package edu.icesi.fitness.service;
+&nbsp;
+&nbsp;import edu.icesi.fitness.model.Permission;
+&nbsp;import edu.icesi.fitness.model.Role;
+&nbsp;import edu.icesi.fitness.repository.PermissionRepository;
+&nbsp;import edu.icesi.fitness.repository.RoleRepository;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class RoleService {
+&nbsp;
+&nbsp;    private final RoleRepository roleRepository;
+&nbsp;    private final PermissionRepository permissionRepository;
+&nbsp;
+&nbsp;    // Permiso por defecto de solo visualización
+&nbsp;    public static final String DEFAULT_VIEW_PERMISSION = &quot;app:view&quot;;
+&nbsp;
+&nbsp;    public RoleService(RoleRepository roleRepository,
+<b class="fc">&nbsp;                       PermissionRepository permissionRepository) {</b>
+<b class="fc">&nbsp;        this.roleRepository = roleRepository;</b>
+<b class="fc">&nbsp;        this.permissionRepository = permissionRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public List&lt;Role&gt; listAll() {
+<b class="nc">&nbsp;        return roleRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    public Role getByName(String roleName) {
+<b class="fc">&nbsp;        return roleRepository.findByName(roleName)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Role not found: &quot; + roleName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Crea el rol si no existe (idempotente) y garantiza que tenga el permiso DEFAULT_VIEW_PERMISSION.
+&nbsp;     * Si se pasan permisos, se agregan (creándolos si no existen).
+&nbsp;     */
+&nbsp;    @Transactional
+&nbsp;    public Role createRole(String roleName, Set&lt;String&gt; permissionNames) {
+<b class="pc">&nbsp;        if (roleName == null || roleName.isBlank()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Role name is required&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Role role = roleRepository.findByName(roleName).orElse(null);</b>
+<b class="fc">&nbsp;        if (role == null) {</b>
+<b class="fc">&nbsp;            role = new Role();</b>
+<b class="fc">&nbsp;            role.setName(roleName);</b>
+<b class="fc">&nbsp;            role.setPermissions(new ArrayList&lt;&gt;());</b>
+<b class="pc">&nbsp;        } else if (role.getPermissions() == null) {</b>
+<b class="nc">&nbsp;            role.setPermissions(new ArrayList&lt;&gt;());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Asegurar permiso por defecto
+<b class="fc">&nbsp;        Permission defaultView = permissionRepository.findByName(DEFAULT_VIEW_PERMISSION)</b>
+<b class="fc">&nbsp;                .orElseGet(() -&gt; {</b>
+<b class="fc">&nbsp;                    Permission np = new Permission();</b>
+<b class="fc">&nbsp;                    np.setName(DEFAULT_VIEW_PERMISSION);</b>
+<b class="fc">&nbsp;                    return permissionRepository.save(np);</b>
+&nbsp;                });
+&nbsp;
+&nbsp;        // Añadir el default si no está
+<b class="fc">&nbsp;        if (role.getPermissions().stream().noneMatch(p -&gt; DEFAULT_VIEW_PERMISSION.equals(p.getName()))) {</b>
+<b class="fc">&nbsp;            role.getPermissions().add(defaultView);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Agregar adicionales (si vienen)
+<b class="pc">&nbsp;        if (permissionNames != null) {</b>
+<b class="fc">&nbsp;            for (String pn : permissionNames) {</b>
+<b class="pc">&nbsp;                if (pn == null || pn.isBlank()) continue;</b>
+<b class="pc">&nbsp;                if (DEFAULT_VIEW_PERMISSION.equals(pn)) continue; // ya garantizado</b>
+&nbsp;
+<b class="fc">&nbsp;                Permission p = permissionRepository.findByName(pn)</b>
+<b class="fc">&nbsp;                        .orElseGet(() -&gt; {</b>
+<b class="fc">&nbsp;                            Permission np = new Permission();</b>
+<b class="fc">&nbsp;                            np.setName(pn);</b>
+<b class="fc">&nbsp;                            return permissionRepository.save(np);</b>
+&nbsp;                        });
+&nbsp;
+&nbsp;                // evitar duplicados por nombre
+<b class="fc">&nbsp;                boolean exists = role.getPermissions().stream()</b>
+<b class="fc">&nbsp;                        .anyMatch(existing -&gt; existing.getName().equals(p.getName()));</b>
+<b class="pc">&nbsp;                if (!exists) {</b>
+<b class="fc">&nbsp;                    role.getPermissions().add(p);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return roleRepository.save(role);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reemplaza la lista de permisos por los indicados, siempre conservando DEFAULT_VIEW_PERMISSION.
+&nbsp;     */
+&nbsp;    @Transactional
+&nbsp;    public Role setPermissions(String roleName, Set&lt;String&gt; permissionNames) {
+<b class="fc">&nbsp;        Role role = getByName(roleName);</b>
+&nbsp;
+&nbsp;        // Siempre incluir el permiso por defecto
+<b class="fc">&nbsp;        Set&lt;String&gt; names = new LinkedHashSet&lt;&gt;();</b>
+<b class="pc">&nbsp;        if (permissionNames != null) names.addAll(permissionNames);</b>
+<b class="fc">&nbsp;        names.add(DEFAULT_VIEW_PERMISSION);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;Permission&gt; newList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (String n : names) {</b>
+<b class="fc">&nbsp;            Permission p = permissionRepository.findByName(n)</b>
+<b class="fc">&nbsp;                    .orElseGet(() -&gt; {</b>
+<b class="nc">&nbsp;                        Permission np = new Permission();</b>
+<b class="nc">&nbsp;                        np.setName(n);</b>
+<b class="nc">&nbsp;                        return permissionRepository.save(np);</b>
+&nbsp;                    });
+<b class="fc">&nbsp;            newList.add(p);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        role.setPermissions(newList);</b>
+<b class="fc">&nbsp;        return roleRepository.save(role);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public Role addPermission(String roleName, String permissionName) {
+<b class="fc">&nbsp;        Role role = getByName(roleName);</b>
+<b class="pc">&nbsp;        if (permissionName == null || permissionName.isBlank()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Permission name is required&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Permission p = permissionRepository.findByName(permissionName)</b>
+<b class="fc">&nbsp;                .orElseGet(() -&gt; {</b>
+<b class="nc">&nbsp;                    Permission np = new Permission();</b>
+<b class="nc">&nbsp;                    np.setName(permissionName);</b>
+<b class="nc">&nbsp;                    return permissionRepository.save(np);</b>
+&nbsp;                });
+&nbsp;
+<b class="pc">&nbsp;        if (role.getPermissions() == null) role.setPermissions(new ArrayList&lt;&gt;());</b>
+<b class="fc">&nbsp;        boolean exists = role.getPermissions().stream().anyMatch(x -&gt; x.getName().equals(p.getName()));</b>
+<b class="pc">&nbsp;        if (!exists) {</b>
+<b class="fc">&nbsp;            role.getPermissions().add(p);</b>
+<b class="fc">&nbsp;            role = roleRepository.save(role);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return role;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public Role removePermission(String roleName, String permissionName) {
+<b class="fc">&nbsp;        Role role = getByName(roleName);</b>
+<b class="pc">&nbsp;        if (role.getPermissions() == null) return role;</b>
+&nbsp;
+&nbsp;        // Evitar quitar el permiso por defecto
+<b class="fc">&nbsp;        if (DEFAULT_VIEW_PERMISSION.equals(permissionName)) {</b>
+<b class="fc">&nbsp;            return role;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        role.getPermissions().removeIf(p -&gt; permissionName.equals(p.getName()));</b>
+<b class="fc">&nbsp;        return roleRepository.save(role);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void delete(String roleName) {
+<b class="nc">&nbsp;        Role role = getByName(roleName);</b>
+<b class="nc">&nbsp;        roleRepository.delete(role);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-20 15:38</div>
+</div>
+</body>
+</html>

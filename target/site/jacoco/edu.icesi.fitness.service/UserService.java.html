@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SpringBoot1</a> &gt; <a href="index.source.html" class="el_package">edu.icesi.fitness.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package edu.icesi.fitness.service;
+
+import edu.icesi.fitness.model.Role;
+import edu.icesi.fitness.model.User;
+import edu.icesi.fitness.model.Permission;
+import edu.icesi.fitness.repository.PermissionRepository;
+import edu.icesi.fitness.repository.RoleRepository;
+import edu.icesi.fitness.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+
+    public static final String DEFAULT_ROLE = &quot;ROLE_USER&quot;;
+    public static final String DEFAULT_VIEW_PERMISSION = &quot;app:view&quot;;
+
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+<span class="fc" id="L26">                       PermissionRepository permissionRepository) {</span>
+<span class="fc" id="L27">        this.userRepository = userRepository;</span>
+<span class="fc" id="L28">        this.roleRepository = roleRepository;</span>
+<span class="fc" id="L29">        this.permissionRepository = permissionRepository;</span>
+<span class="fc" id="L30">    }</span>
+
+    @Transactional(readOnly = true)
+    public List&lt;User&gt; listAll() {
+<span class="fc" id="L34">        return userRepository.findAll();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public User getById(Long id) {
+<span class="fc" id="L39">        return userRepository.findById(id)</span>
+<span class="fc" id="L40">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;User not found: &quot; + id));</span>
+    }
+
+    /**
+     * Crea un usuario y garantiza asignar ROLE_USER (que incluye el permiso &quot;app:view&quot;).
+     * Si vienen roles extra, los agrega si existen (o los crea si quieres activar el crear-si-no-existe).
+     */
+    @Transactional
+    public User createUser(String name, String email, String rawPassword, Set&lt;String&gt; extraRoles) {
+<span class="pc bpc" id="L49" title="2 of 4 branches missed.">        if (name == null || name.isBlank()) throw new IllegalArgumentException(&quot;Name is required&quot;);</span>
+<span class="pc bpc" id="L50" title="2 of 4 branches missed.">        if (email == null || email.isBlank()) throw new IllegalArgumentException(&quot;Email is required&quot;);</span>
+<span class="pc bpc" id="L51" title="2 of 4 branches missed.">        if (rawPassword == null || rawPassword.isBlank()) throw new IllegalArgumentException(&quot;Password is required&quot;);</span>
+
+        // asegurar ROLE_USER idempotente y que tenga app:view
+<span class="fc" id="L54">        Role roleUser = roleRepository.findByName(DEFAULT_ROLE).orElseGet(() -&gt; {</span>
+<span class="fc" id="L55">            Role r = new Role();</span>
+<span class="fc" id="L56">            r.setName(DEFAULT_ROLE);</span>
+<span class="fc" id="L57">            r.setPermissions(new ArrayList&lt;&gt;());</span>
+
+<span class="fc" id="L59">            Permission view = permissionRepository.findByName(DEFAULT_VIEW_PERMISSION)</span>
+<span class="fc" id="L60">                    .orElseGet(() -&gt; {</span>
+<span class="fc" id="L61">                        Permission p = new Permission();</span>
+<span class="fc" id="L62">                        p.setName(DEFAULT_VIEW_PERMISSION);</span>
+<span class="fc" id="L63">                        return permissionRepository.save(p);</span>
+                    });
+
+<span class="fc" id="L66">            r.getPermissions().add(view);</span>
+<span class="fc" id="L67">            return roleRepository.save(r);</span>
+        });
+
+<span class="fc" id="L70">        User u = new User();</span>
+<span class="fc" id="L71">        u.setName(name);</span>
+<span class="fc" id="L72">        u.setEmail(email);</span>
+<span class="fc" id="L73">        u.setPassword(rawPassword); // en real, encriptar</span>
+
+        // siempre ROLE_USER
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (u.getRoles() == null) u.setRoles(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L77">        u.getRoles().add(roleUser);</span>
+
+        // roles extra si vienen
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if (extraRoles != null) {</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            for (String rn : extraRoles) {</span>
+<span class="pc bpc" id="L82" title="2 of 4 branches missed.">                if (rn == null || rn.isBlank()) continue;</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">                if (DEFAULT_ROLE.equals(rn)) continue; // ya está</span>
+<span class="fc" id="L84">                roleRepository.findByName(rn).ifPresent(role -&gt; {</span>
+<span class="fc" id="L85">                    boolean exists = u.getRoles().stream()</span>
+<span class="fc" id="L86">                            .anyMatch(r -&gt; r.getName().equals(role.getName()));</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                    if (!exists) u.getRoles().add(role);</span>
+<span class="fc" id="L88">                });</span>
+<span class="fc" id="L89">            }</span>
+        }
+
+<span class="fc" id="L92">        return userRepository.save(u);</span>
+    }
+
+    @Transactional
+    public User setRoles(long userId, Set&lt;String&gt; roleNames) {
+<span class="fc" id="L97">        User u = getById(userId);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (u.getRoles() == null) u.setRoles(new ArrayList&lt;&gt;());</span>
+
+        // Garantizar ROLE_USER
+<span class="fc" id="L101">        Role roleUser = roleRepository.findByName(DEFAULT_ROLE).orElseGet(() -&gt; {</span>
+<span class="nc" id="L102">            Role r = new Role();</span>
+<span class="nc" id="L103">            r.setName(DEFAULT_ROLE);</span>
+<span class="nc" id="L104">            r.setPermissions(new ArrayList&lt;&gt;());</span>
+
+<span class="nc" id="L106">            Permission view = permissionRepository.findByName(DEFAULT_VIEW_PERMISSION)</span>
+<span class="nc" id="L107">                    .orElseGet(() -&gt; {</span>
+<span class="nc" id="L108">                        Permission p = new Permission();</span>
+<span class="nc" id="L109">                        p.setName(DEFAULT_VIEW_PERMISSION);</span>
+<span class="nc" id="L110">                        return permissionRepository.save(p);</span>
+                    });
+<span class="nc" id="L112">            r.getPermissions().add(view);</span>
+<span class="nc" id="L113">            return roleRepository.save(r);</span>
+        });
+
+<span class="fc" id="L116">        Set&lt;String&gt; toAssign = new LinkedHashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (roleNames != null) toAssign.addAll(roleNames);</span>
+<span class="fc" id="L118">        toAssign.add(DEFAULT_ROLE); // siempre incluido</span>
+
+<span class="fc" id="L120">        List&lt;Role&gt; newList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        for (String rn : toAssign) {</span>
+<span class="fc" id="L122">            roleRepository.findByName(rn).ifPresent(newList::add);</span>
+<span class="fc" id="L123">        }</span>
+<span class="fc" id="L124">        u.setRoles(newList);</span>
+<span class="fc" id="L125">        return userRepository.save(u);</span>
+    }
+
+    @Transactional
+    public User addRole(long userId, String roleName) {
+<span class="pc bpc" id="L130" title="2 of 4 branches missed.">        if (roleName == null || roleName.isBlank()) {</span>
+<span class="nc" id="L131">            throw new IllegalArgumentException(&quot;Role name is required&quot;);</span>
+        }
+<span class="fc" id="L133">        User u = getById(userId);</span>
+<span class="fc" id="L134">        Role role = roleRepository.findByName(roleName)</span>
+<span class="pc" id="L135">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Role not found: &quot; + roleName));</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (u.getRoles() == null) u.setRoles(new ArrayList&lt;&gt;());</span>
+<span class="pc" id="L137">        boolean exists = u.getRoles().stream().anyMatch(r -&gt; r.getName().equals(role.getName()));</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (!exists) {</span>
+<span class="fc" id="L139">            u.getRoles().add(role);</span>
+<span class="fc" id="L140">            u = userRepository.save(u);</span>
+        }
+<span class="fc" id="L142">        return u;</span>
+    }
+
+    @Transactional
+    public User removeRole(long userId, String roleName) {
+<span class="fc" id="L147">        User u = getById(userId);</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if (u.getRoles() == null) return u;</span>
+
+        // (Opcional) impedir que se quite el DEFAULT_ROLE
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">        if (DEFAULT_ROLE.equals(roleName)) {</span>
+<span class="fc" id="L152">            return u; // ignorar</span>
+        }
+
+<span class="nc" id="L155">        u.getRoles().removeIf(r -&gt; roleName.equals(r.getName()));</span>
+<span class="nc" id="L156">        return userRepository.save(u);</span>
+    }
+
+    @Transactional
+    public void deleteUser(long id) {
+<span class="fc" id="L161">        User u = getById(id);</span>
+<span class="fc" id="L162">        userRepository.delete(u);</span>
+<span class="fc" id="L163">    }</span>
+
+    @Transactional
+    public User updateBasicInfo(long id, String name, String email, String rawPassword) {
+<span class="fc" id="L167">        User u = getById(id);</span>
+<span class="pc bpc" id="L168" title="2 of 4 branches missed.">        if (name != null &amp;&amp; !name.isBlank()) u.setName(name);</span>
+<span class="pc bpc" id="L169" title="2 of 4 branches missed.">        if (email != null &amp;&amp; !email.isBlank()) u.setEmail(email);</span>
+<span class="pc bpc" id="L170" title="2 of 4 branches missed.">        if (rawPassword != null &amp;&amp; !rawPassword.isBlank()) u.setPassword(rawPassword);</span>
+<span class="fc" id="L171">        return userRepository.save(u);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
