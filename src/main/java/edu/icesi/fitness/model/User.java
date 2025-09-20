@@ -118,6 +118,10 @@ public class User {
         this.roles = roles;
     }
 
+    public void setRole(Role role) {
+        this.roles.add(role);
+    }
+
     public String getPassword() {
         return password;
     }

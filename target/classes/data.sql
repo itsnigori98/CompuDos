@@ -98,8 +98,10 @@ VALUES (2, 8, 300, 1, '2025-09-20');
 -- ROLES
 -- ============================================
 
-INSERT INTO roles (id, name) VALUES (1, 'ROLE_ADMIN');
-INSERT INTO roles (id, name) VALUES (2, 'ROLE_USER');
+INSERT INTO roles ( name) VALUES ( 'ROLE_USER');
+INSERT INTO roles ( name) VALUES ( 'ROLE_ADMIN');
+
+
 
 
 -- ============================================

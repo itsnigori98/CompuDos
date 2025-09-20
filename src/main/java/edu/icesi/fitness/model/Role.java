@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name")
+})
 public class Role {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +33,9 @@ public class Role {
     private List<Permission> permissions = new ArrayList<>();
 
     public Role() {
+    }
+
+    public Role(String name) {
     }
 
     public Integer getId() {
@@ -64,6 +68,9 @@ public class Role {
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public void setEmail(String emailTest) {
     }
 }
 
