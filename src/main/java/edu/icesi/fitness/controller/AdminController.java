@@ -248,6 +248,8 @@ public class AdminController {
     public User removeRole(@PathVariable Long id, @PathVariable String roleName) {
         return userService.removeRole(id, roleName);
     }
+
+
 }
 
 

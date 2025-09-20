@@ -16,6 +16,8 @@ public class RoleService {
     private final RoleRepository roles;
     private final PermissionRepository perms;
 
+    private static final String DEFAULT_VIEW_PERMISSION = "app:view";
+
     public RoleService(RoleRepository roles, PermissionRepository perms) {
         this.roles = roles;
         this.perms = perms;
@@ -25,28 +27,50 @@ public class RoleService {
     public Role createRole(String roleName, Set<String> permissionNames) {
         if (roleName == null || roleName.isBlank())
             throw new IllegalArgumentException("Role name is required");
-        if (permissionNames == null || permissionNames.isEmpty())
-            throw new IllegalArgumentException("Role must have at least one permission");
         if (roles.existsByName(roleName))
             throw new IllegalArgumentException("Role already exists: " + roleName);
 
+        // 1) Normaliza el set de nombres recibido (puede venir null)
+        Set<String> names = (permissionNames == null) ? new java.util.LinkedHashSet<>() :
+                new java.util.LinkedHashSet<>(permissionNames);
+
+        // 2) Asegura el permiso por defecto
+        names.add(DEFAULT_VIEW_PERMISSION);
+
+        // 3) Resuelve objetos Permission (si no existen, créalos)
+        java.util.List<Permission> resolved = new java.util.ArrayList<>();
+        for (String n : names) {
+            Permission p = perms.findByName(n).orElseGet(() -> {
+                Permission np = new Permission();
+                np.setName(n);
+                return perms.save(np);
+            });
+            resolved.add(p);
+        }
+
+        // 4) Crea el rol
         Role role = new Role();
         role.setName(roleName);
-        role.setPermissions(resolvePermissions(permissionNames));
-
+        // si tu entidad Role tiene setPermissions(List<Permission>)
+        role.setPermissions(resolved); // o role.getPermissions().addAll(resolved);
         return roles.save(role);
     }
 
     @Transactional
     public Role setPermissions(String roleName, Set<String> permissionNames) {
-        Role role = roles.findByName(roleName)
-                .orElseThrow(() -> new NoSuchElementException("Role not found: " + roleName));
+        Role role = roles.findByName(roleName).orElseThrow();
+        if (permissionNames == null) permissionNames = java.util.Set.of();
 
-        if (permissionNames == null || permissionNames.isEmpty())
-            throw new IllegalArgumentException("Role must retain at least one permission");
+        // fuerza incluir el default
+        java.util.Set<String> names = new java.util.LinkedHashSet<>(permissionNames);
+        names.add(DEFAULT_VIEW_PERMISSION);
 
+        // reemplaza la lista
         role.getPermissions().clear();
-        role.getPermissions().addAll(resolvePermissions(permissionNames));
+        for (String n : names) {
+            Permission p = perms.findByName(n).orElseThrow();
+            role.getPermissions().add(p);
+        }
         return role;
     }
 
